@@ -5,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Battleship Game</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-database.js"></script>
-    <script src="script.js" defer></script>
+    <script type="module" src="script.js" defer></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -106,106 +104,5 @@
         <h3>Player Scores</h3>
         <ul id="scoreList"></ul>
     </div>
-
-    <script>
-        // Firebase Initialization
-        const firebaseConfig = {
-            apiKey: "AIzaSyA2l_bt2MxCPMJGl9ImOjp2FBU-skkkSNw",
-            authDomain: "battleship-10733.firebaseapp.com",
-            databaseURL: "https://battleship-10733-default-rtdb.firebaseio.com",
-            projectId: "battleship-10733",
-            storageBucket: "battleship-10733.firebasestorage.app",
-            messagingSenderId: "137222756550",
-            appId: "1:137222756550:web:c62b2691c35d4ea6061fc7",
-            measurementId: "G-0S248X0JM1"
-        };
-
-        // Initialize Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-
-        // Log confirmation for Firebase initialization
-        console.log("Firebase initialized");
-
-        const playerCodes = {
-            "Hamza Noor": "HN123",
-            "Samer Smahan": "SS456",
-            "Moatz Abo Alkhair": "MA789",
-            "Braa Abo Klisha": "BK101",
-            "Yousef Mohaned": "YM112",
-            "Admin": "ADMIN4444"
-        };
-
-        let playerScores = {
-            "Hamza Noor": 0,
-            "Samer Smahan": 0,
-            "Moatz Abo Alkhair": 0,
-            "Braa Abo Klisha": 0,
-            "Yousef Mohaned": 0
-        };
-
-        let placedTroops = new Set();
-        
-        function login() {
-            let code = document.getElementById("loginCode").value;
-            let playerName = Object.keys(playerCodes).find(name => playerCodes[name] === code);
-            
-            if (playerName) {
-                document.getElementById("loginSection").style.display = "none";
-                if (playerName === "Admin") {
-                    document.getElementById("adminSection").style.display = "block";
-                    updateAdminPanel();
-                } else {
-                    document.getElementById("gameSection").style.display = "block";
-                    createBoard("gameBoard", placeTroop);
-                }
-            } else {
-                alert("Invalid login code");
-            }
-        }
-
-        function createBoard(boardId, clickHandler) {
-            const board = document.getElementById(boardId);
-            board.innerHTML = "";
-            for (let i = 0; i < 10; i++) {
-                for (let j = 0; j < 10; j++) {
-                    let cell = document.createElement("div");
-                    cell.classList.add("cell");
-                    cell.dataset.coord = `${i},${j}`;
-                    cell.textContent = `${i},${j}`;
-                    if (clickHandler) cell.addEventListener("click", clickHandler);
-                    board.appendChild(cell);
-                }
-            }
-        }
-
-        function placeTroop(event) {
-            if (placedTroops.size < 12) {
-                event.target.classList.add("placed");
-                placedTroops.add(event.target.dataset.coord);
-            } else {
-                alert("You can only place 12 troops.");
-            }
-        }
-
-        function useAttackCode() {
-            let coordinate = document.getElementById("attackCoordinate").value;
-            let result = document.getElementById("attackResult");
-            let hit = placedTroops.has(coordinate);
-            result.textContent = hit ? "Hit! +5 Points" : "You have hit nothing.";
-            if (hit) playerScores["Hamza Noor"] += 5;
-            updateAdminPanel();
-        }
-
-        function updateAdminPanel() {
-            let scoreList = document.getElementById("scoreList");
-            scoreList.innerHTML = "";
-            for (let player in playerScores) {
-                let li = document.createElement("li");
-                li.textContent = `${player}: ${playerScores[player]} points`;
-                scoreList.appendChild(li);
-            }
-        }
-    </script>
 </body>
 </html>
