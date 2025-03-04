@@ -1,71 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Battleship Game</title>
     <link rel="stylesheet" href="styles.css">
-    <script type="module" src="script.js" defer></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(to right, #ff7e5f, #feb47b);
-            color: white;
-            text-align: center;
-            padding: 20px;
-        }
-        .container {
-            background: rgba(0, 0, 0, 0.7);
-            padding: 20px;
-            border-radius: 10px;
-            display: inline-block;
-        }
-        .board {
-            display: grid;
-            grid-template-columns: repeat(10, 40px);
-            grid-template-rows: repeat(10, 40px);
-            gap: 2px;
-            margin: 20px auto;
-            width: fit-content;
-        }
-        .cell {
-            width: 40px;
-            height: 40px;
-            background-color: lightblue;
-            border: 1px solid white;
-            text-align: center;
-            line-height: 40px;
-            cursor: pointer;
-        }
-        .cell.placed {
-            background-color: red;
-        }
-        .cell.hit {
-            background-color: green;
-        }
-        .cell.miss {
-            background-color: gray;
-        }
-        input, button, select {
-            padding: 10px;
-            margin: 10px;
-            border-radius: 5px;
-            border: none;
-        }
-        button {
-            background: #4CAF50;
-            color: white;
-            cursor: pointer;
-        }
-        button:hover {
-            background: #45a049;
-        }
-        #attackSection, #adminSection {
-            display: none;
-            margin-top: 20px;
-        }
-    </style>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-database.js"></script>
 </head>
+
 <body>
     <div class="container" id="loginSection">
         <h1>Welcome to the Battleship Game</h1>
@@ -80,29 +26,23 @@
         <button onclick="readyUp()">Ready</button>
     </div>
 
-    <div class="container" id="attackSection">
+    <div class="container" id="attackSection" style="display:none;">
         <h2>Attack Phase</h2>
         <div class="board" id="attackBoard"></div>
         <h3>Enter Attack Code</h3>
         <input type="text" id="attackCode" placeholder="Enter Attack Code">
-        <h3>Select a Player to Attack</h3>
-        <select id="targetPlayer">
-            <option value="Hamza Noor">Hamza Noor</option>
-            <option value="Samer Smahan">Samer Smahan</option>
-            <option value="Moatz Abo Alkhair">Moatz Abo Alkhair</option>
-            <option value="Braa Abo Klisha">Braa Abo Klisha</option>
-            <option value="Yousef Mohaned">Yousef Mohaned</option>
-        </select>
-        <h3>Enter Grid Coordinates to Attack (e.g., A1, B5)</h3>
-        <input type="text" id="attackCoordinate" placeholder="Enter Coordinate">
         <button onclick="useAttackCode()">Attack</button>
         <p id="attackResult"></p>
     </div>
 
-    <div class="container" id="adminSection">
+    <div class="container" id="adminSection" style="display:none;">
         <h2>Admin Panel</h2>
         <h3>Player Scores</h3>
         <ul id="scoreList"></ul>
     </div>
+
+    <!-- Link the script.js file -->
+    <script src="script.js"></script>
 </body>
+
 </html>
