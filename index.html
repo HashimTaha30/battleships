@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Battleship Game</title>
     <link rel="stylesheet" href="styles.css">
-    
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js"></script>
+
+    <!-- Firebase SDKs (Fix for Import Issues) -->
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
 
     <script>
-        // Firebase Config
+        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyA2l_bt2MxCPMJGl9ImOjp2FBU-skkkSNw",
             authDomain: "battleship-10733.firebaseapp.com",
@@ -26,7 +27,7 @@
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        
+
         let selectedPlayer = "";
 
         function startGame() {
@@ -120,7 +121,6 @@
 </head>
 <body>
 
-    <!-- Player Selection -->
     <div class="container" id="loginSection">
         <h1>Welcome to the Battleship Game</h1>
         <p>Select your player:</p>
@@ -135,17 +135,14 @@
         <button onclick="startGame()">Start Game</button>
     </div>
 
-    <!-- Game Board -->
     <div class="container" id="gameSection" style="display:none;">
         <h2>Place Your Troops</h2>
         <div class="board" id="gameBoard"></div>
         <button onclick="document.getElementById('attackSection').style.display='block';">Ready</button>
     </div>
 
-    <!-- Attack Section -->
     <div class="container" id="attackSection">
         <h2>Attack Phase</h2>
-        <h3>Enter Grid Coordinates to Attack (e.g., A1, B5)</h3>
         <input type="text" id="attackCoordinate" placeholder="Enter Coordinate">
         <button onclick="useAttackCode()">Attack</button>
         <p id="attackResult"></p>
