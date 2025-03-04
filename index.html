@@ -143,7 +143,7 @@
         let placedTroops = new Set();
         
         function login() {
-            let code = document.getElementById("loginCode").value;
+            let code = document.getElementById("loginCode").value.trim(); // Trim input to remove extra spaces
             let playerName = Object.keys(playerCodes).find(name => playerCodes[name] === code);
             
             if (playerName) {
@@ -156,7 +156,7 @@
                     createBoard("gameBoard", placeTroop);
                 }
             } else {
-                alert("Invalid login code");
+                alert("Invalid login code. Please try again.");
             }
         }
 
@@ -191,7 +191,7 @@
         }
 
         function useAttackCode() {
-            let coordinate = document.getElementById("attackCoordinate").value;
+            let coordinate = document.getElementById("attackCoordinate").value.trim(); // Trim input to remove extra spaces
             let result = document.getElementById("attackResult");
             let hit = placedTroops.has(coordinate);
             result.textContent = hit ? "Hit! +5 Points" : "You have hit nothing.";
