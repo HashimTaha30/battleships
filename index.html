@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Battleship Game</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -12,14 +14,12 @@
             text-align: center;
             padding: 20px;
         }
-
         .container {
             background: rgba(0, 0, 0, 0.7);
             padding: 20px;
             border-radius: 10px;
             display: inline-block;
         }
-
         .board {
             display: grid;
             grid-template-columns: repeat(10, 40px);
@@ -28,7 +28,6 @@
             margin: 20px auto;
             width: fit-content;
         }
-
         .cell {
             width: 40px;
             height: 40px;
@@ -38,40 +37,29 @@
             line-height: 40px;
             cursor: pointer;
         }
-
         .cell.placed {
             background-color: red;
         }
-
         .cell.hit {
             background-color: green;
         }
-
         .cell.miss {
             background-color: gray;
         }
-
         input, button, select {
             padding: 10px;
             margin: 10px;
             border-radius: 5px;
             border: none;
         }
-
         button {
             background: #4CAF50;
             color: white;
             cursor: pointer;
         }
-
         button:hover {
             background: #45a049;
         }
-
-        #gameSection {
-            display: none;
-        }
-
         #attackSection, #adminSection {
             display: none;
             margin-top: 20px;
@@ -81,18 +69,21 @@
 <body>
     <div class="container" id="loginSection">
         <h1>Welcome to the Battleship Game</h1>
-        <p>Select your name to start:</p>
-        <button onclick="selectPlayer('Hamza Noor')">Hamza Noor</button>
-        <button onclick="selectPlayer('Samer Smahan')">Samer Smahan</button>
-        <button onclick="selectPlayer('Moatz Abo Alkhair')">Moatz Abo Alkhair</button>
-        <button onclick="selectPlayer('Braa Abo Klisha')">Braa Abo Klisha</button>
-        <button onclick="selectPlayer('Yousef Mohaned')">Yousef Mohaned</button>
+        <p>Choose your name to begin:</p>
+        <select id="playerSelect">
+            <option value="Hamza Noor">Hamza Noor</option>
+            <option value="Samer Smahan">Samer Smahan</option>
+            <option value="Moatz Abo Alkhair">Moatz Abo Alkhair</option>
+            <option value="Braa Abo Klisha">Braa Abo Klisha</option>
+            <option value="Yousef Mohaned">Yousef Mohaned</option>
+        </select>
+        <button onclick="startGame()">Start Game</button>
     </div>
 
-    <div class="container" id="gameSection">
+    <div class="container" id="gameSection" style="display:none;">
         <h2>Place Your Troops</h2>
         <div class="board" id="gameBoard"></div>
-        <button onclick="startGame()">Start Game</button>
+        <button onclick="readyUp()">Ready</button>
     </div>
 
     <div class="container" id="attackSection">
@@ -100,27 +91,22 @@
         <div class="board" id="attackBoard"></div>
         <h3>Enter Attack Code</h3>
         <input type="text" id="attackCode" placeholder="Enter Attack Code">
-        <h3>Select a Player to Attack</h3>
-        <select id="targetPlayer">
-            <option value="Hamza Noor">Hamza Noor</option>
-            <option value="Samer Smahan">Samer Smahan</option>
-            <option value="Moatz Abo Alkhair">Moatz Abo Alkhair</option>
-            <option value="Braa Abo Klisha">Braa Abo Klisha</option>
-            <option value="Yousef Mohaned">Yousef Mohaned</option>
-        </select>
         <h3>Enter Grid Coordinates to Attack (e.g., A1, B5)</h3>
         <input type="text" id="attackCoordinate" placeholder="Enter Coordinate">
         <button onclick="useAttackCode()">Attack</button>
         <p id="attackResult"></p>
     </div>
 
-    <div class="container" id="adminSection">
-        <h2>Admin Panel</h2>
-        <h3>Player Scores</h3>
-        <ul id="scoreList"></ul>
-    </div>
-
     <script>
+        const validAttackCodes = [
+            '8R3P2H', 'G7J9F4', 'W9T2N1', 'P3V6K0', 'A5B2D8',
+            'Z1X4L3', 'J9C2Y5', 'Q4H7A9', 'U5V2S1', 'O7F3J8',
+            'R8W1G2', 'D6T4P7', 'M2B9Z0', 'V1E4N6', 'Y8A3F0',
+            'N7G2T9', 'L9H4V5', 'E3J6X2', 'B5P1Y4', 'F7W3Q9',
+            'T2S8R1', 'H6U5V3', 'K4O2J9', 'S1Y8A0', 'F3M5D7'
+        ];
+        
+        let usedAttackCodes = [];
         let selectedPlayer = null;
         let placedTroops = new Set();
         let playerScores = {
@@ -131,11 +117,12 @@
             "Yousef Mohaned": 0
         };
 
-        function selectPlayer(playerName) {
-            selectedPlayer = playerName;
+        function startGame() {
+            selectedPlayer = document.getElementById("playerSelect").value;
             document.getElementById("loginSection").style.display = "none";
             document.getElementById("gameSection").style.display = "block";
             createBoard("gameBoard", placeTroop);
+            displayPlayerScore();
         }
 
         function createBoard(boardId, clickHandler) {
@@ -162,48 +149,44 @@
             }
         }
 
-        function startGame() {
-            console.log(`${selectedPlayer} has started the game!`);
+        function readyUp() {
+            alert("You are ready!");
             document.getElementById("gameSection").style.display = "none";
             document.getElementById("attackSection").style.display = "block";
-            createBoard("attackBoard", attackCell);
-        }
-
-        function attackCell(event) {
-            const coordinate = event.target.dataset.coord;
-            if (placedTroops.has(coordinate)) {
-                event.target.classList.add("hit");
-                playerScores[selectedPlayer] += 5;
-            } else {
-                event.target.classList.add("miss");
-            }
-            updateScore();
+            createBoard("attackBoard");
         }
 
         function useAttackCode() {
-            let result = document.getElementById("attackResult");
-            let coordinate = document.getElementById("attackCoordinate").value;
-            let targetPlayer = document.getElementById("targetPlayer").value;
-            
-            // Check if attack coordinate exists in placedTroops for target player
-            let hit = placedTroops.has(coordinate);
-            result.textContent = hit ? `${targetPlayer}: Hit! +5 Points` : `${targetPlayer}: Missed!`;
+            const attackCode = document.getElementById("attackCode").value;
+            const coordinate = document.getElementById("attackCoordinate").value;
+            const result = document.getElementById("attackResult");
 
+            if (!validAttackCodes.includes(attackCode)) {
+                result.textContent = "Invalid Attack Code!";
+                return;
+            }
+
+            if (usedAttackCodes.includes(attackCode)) {
+                result.textContent = "This attack code has already been used!";
+                return;
+            }
+
+            // Mark the code as used
+            usedAttackCodes.push(attackCode);
+            validAttackCodes.splice(validAttackCodes.indexOf(attackCode), 1);
+
+            let hit = placedTroops.has(coordinate);
+            result.textContent = hit ? "Hit! +5 Points" : "You missed!";
             if (hit) {
                 playerScores[selectedPlayer] += 5;
+                displayPlayerScore();
             }
-
-            updateScore();
         }
 
-        function updateScore() {
-            let scoreList = document.getElementById("scoreList");
-            scoreList.innerHTML = "";
-            for (let player in playerScores) {
-                let li = document.createElement("li");
-                li.textContent = `${player}: ${playerScores[player]} points`;
-                scoreList.appendChild(li);
-            }
+        function displayPlayerScore() {
+            const score = document.createElement("div");
+            score.textContent = `${selectedPlayer}: ${playerScores[selectedPlayer]} points`;
+            document.getElementById("gameSection").appendChild(score);
         }
     </script>
 </body>
