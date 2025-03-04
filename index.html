@@ -4,160 +4,121 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Battleship Game</title>
-    <script type="module">
-        // Import Supabase client
-        import { createClient } from "https://esm.sh/@supabase/supabase-js";
-
-        // Supabase Setup
-        const SUPABASE_URL = "https://twhavmjsuxmghuhroalo.supabase.co";
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3aGF2bWpzdXhtZ2h1aHJvYWxvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDExMTc5NjQsImV4cCI6MjA1NjY5Mzk2NH0.ynsIzyycJ2_Qy_GhF316bvVINjjIaMSP_HWTBxx-Xyg";
-        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        let selectedPlayer = null;
-
-        // Load Available Players from Supabase
-        async function loadPlayers() {
-            try {
-                // Fetch players from Supabase
-                const { data, error } = await supabase.from("players").select("name");
-
-                if (error) {
-                    console.error("Error fetching players:", error.message);
-                    return;
-                }
-
-                // Check if players exist, if not, add them
-                if (data.length === 0) {
-                    console.log("No players found, adding default players...");
-
-                    await supabase.from("players").upsert([
-                        { name: "Hamza Noor", score: 0, grid: [] },
-                        { name: "Samer Smahan", score: 0, grid: [] },
-                        { name: "Moatz Abo Alkhair", score: 0, grid: [] },
-                        { name: "Braa Abo Klisha", score: 0, grid: [] },
-                        { name: "Yousef Mohaned", score: 0, grid: [] }
-                    ]);
-
-                    // Re-fetch players after adding
-                    loadPlayers();
-                    return;
-                }
-
-                // Populate player select options
-                const playerSelect = document.getElementById("playerSelect");
-                playerSelect.innerHTML = data.map(p => `<option value="${p.name}">${p.name}</option>`).join("");
-
-            } catch (err) {
-                console.error("Error loading players:", err);
-            }
-        }
-
-        // Start the Game
-        async function startGame() {
-            selectedPlayer = document.getElementById("playerSelect").value;
-            if (!selectedPlayer) {
-                alert("Please select a player.");
-                return;
-            }
-
-            // Hide login and show game screen
-            document.getElementById("loginSection").style.display = "none";
-            document.getElementById("gameSection").style.display = "block";
-
-            // Create game board
-            createBoard("gameBoard", placeTroop);
-        }
-
-        // Create Game Board
-        function createBoard(boardId, clickHandler) {
-            const board = document.getElementById(boardId);
-            board.innerHTML = "";
-
-            for (let i = 0; i < 10; i++) {
-                for (let j = 0; j < 10; j++) {
-                    let cell = document.createElement("div");
-                    cell.classList.add("cell");
-                    cell.dataset.coord = `${i},${j}`;
-                    cell.textContent = `${i},${j}`;
-
-                    if (clickHandler) {
-                        cell.addEventListener("click", clickHandler);
-                    }
-
-                    board.appendChild(cell);
-                }
-            }
-        }
-
-        // Place Troops
-        let placedTroops = new Set();
-        function placeTroop(event) {
-            if (placedTroops.size < 12) {
-                event.target.classList.add("placed");
-                placedTroops.add(event.target.dataset.coord);
-            } else {
-                alert("You can only place 12 troops.");
-            }
-        }
-
-        // Attack Another Player
-        async function attack() {
-            let coordinate = document.getElementById("attackCoordinate").value;
-            if (!coordinate) {
-                alert("Enter a coordinate!");
-                return;
-            }
-
-            // Check if player's grid contains the attack coordinate
-            const { data, error } = await supabase.from("players").select("grid").eq("name", selectedPlayer);
-            if (error || !data.length) {
-                alert("Error getting player data.");
-                return;
-            }
-
-            let grid = data[0].grid || [];
-            let hit = grid.includes(coordinate);
-            document.getElementById("attackResult").textContent = hit ? "Hit! +5 Points" : "Miss!";
-
-            // Update score in Supabase if hit
-            if (hit) {
-                await supabase.from("players").update({ score: supabase.raw("score + 5") }).eq("name", selectedPlayer);
-            }
-        }
-
-        // Load Players on Start
-        loadPlayers();
-    </script>
-
+    <script src="script.js" defer></script>
     <style>
-        body { font-family: Arial, sans-serif; background: linear-gradient(to right, #ff7e5f, #feb47b); color: white; text-align: center; padding: 20px; }
-        .container { background: rgba(0, 0, 0, 0.7); padding: 20px; border-radius: 10px; display: inline-block; }
-        .board { display: grid; grid-template-columns: repeat(10, 40px); grid-template-rows: repeat(10, 40px); gap: 2px; margin: 20px auto; width: fit-content; }
-        .cell { width: 40px; height: 40px; background-color: lightblue; border: 1px solid white; text-align: center; line-height: 40px; cursor: pointer; }
-        .cell.placed { background-color: red; }
-        input, button, select { padding: 10px; margin: 10px; border-radius: 5px; border: none; }
-        button { background: #4CAF50; color: white; cursor: pointer; }
-        button:hover { background: #45a049; }
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(10, 40px);
+            grid-template-rows: repeat(10, 40px);
+            gap: 2px;
+            margin: 20px auto;
+            width: fit-content;
+        }
+
+        .cell {
+            width: 40px;
+            height: 40px;
+            background-color: lightblue;
+            border: 1px solid white;
+            text-align: center;
+            line-height: 40px;
+            cursor: pointer;
+        }
+
+        .cell.placed {
+            background-color: red;
+        }
+
+        .cell.hit {
+            background-color: green;
+        }
+
+        .cell.miss {
+            background-color: gray;
+        }
+
+        input, button, select {
+            padding: 10px;
+            margin: 10px;
+            border-radius: 5px;
+            border: none;
+        }
+
+        button {
+            background: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+
+        #gameSection {
+            display: none;
+        }
+
+        #attackSection, #adminSection {
+            display: none;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
-
-    <!-- Login Section -->
     <div class="container" id="loginSection">
-        <h1>Welcome to Battleship</h1>
-        <p>Select a player:</p>
-        <select id="playerSelect"></select>
-        <button onclick="startGame()">Start</button>
+        <h1>Welcome to the Battleship Game</h1>
+        <p>Select your name to start:</p>
+        <button onclick="selectPlayer('Hamza Noor')">Hamza Noor</button>
+        <button onclick="selectPlayer('Samer Smahan')">Samer Smahan</button>
+        <button onclick="selectPlayer('Moatz Abo Alkhair')">Moatz Abo Alkhair</button>
+        <button onclick="selectPlayer('Braa Abo Klisha')">Braa Abo Klisha</button>
+        <button onclick="selectPlayer('Yousef Mohaned')">Yousef Mohaned</button>
     </div>
 
-    <!-- Game Section -->
-    <div class="container" id="gameSection" style="display:none;">
+    <div class="container" id="gameSection">
         <h2>Place Your Troops</h2>
         <div class="board" id="gameBoard"></div>
-        <button onclick="attack()">Attack</button>
+        <button onclick="startGame()">Start Game</button>
+    </div>
+
+    <div class="container" id="attackSection">
+        <h2>Attack Phase</h2>
+        <div class="board" id="attackBoard"></div>
+        <h3>Enter Attack Code</h3>
+        <input type="text" id="attackCode" placeholder="Enter Attack Code">
+        <h3>Select a Player to Attack</h3>
+        <select id="targetPlayer">
+            <option value="Hamza Noor">Hamza Noor</option>
+            <option value="Samer Smahan">Samer Smahan</option>
+            <option value="Moatz Abo Alkhair">Moatz Abo Alkhair</option>
+            <option value="Braa Abo Klisha">Braa Abo Klisha</option>
+            <option value="Yousef Mohaned">Yousef Mohaned</option>
+        </select>
+        <h3>Enter Grid Coordinates to Attack (e.g., A1, B5)</h3>
         <input type="text" id="attackCoordinate" placeholder="Enter Coordinate">
+        <button onclick="useAttackCode()">Attack</button>
         <p id="attackResult"></p>
     </div>
 
+    <div class="container" id="adminSection">
+        <h2>Admin Panel</h2>
+        <h3>Player Scores</h3>
+        <ul id="scoreList"></ul>
+    </div>
 </body>
 </html>
