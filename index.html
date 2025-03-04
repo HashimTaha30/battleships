@@ -5,37 +5,180 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Battleship Game</title>
-    <link rel="stylesheet" href="styles.css">
 
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-database.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(10, 40px);
+            grid-template-rows: repeat(10, 40px);
+            gap: 2px;
+            margin: 20px auto;
+            width: fit-content;
+        }
+
+        .cell {
+            width: 40px;
+            height: 40px;
+            background-color: lightblue;
+            border: 1px solid white;
+            text-align: center;
+            line-height: 40px;
+            cursor: pointer;
+        }
+
+        .cell.placed {
+            background-color: red;
+        }
+
+        .cell.hit {
+            background-color: green;
+        }
+
+        .cell.miss {
+            background-color: gray;
+        }
+
+        input, button, select {
+            padding: 10px;
+            margin: 10px;
+            border-radius: 5px;
+            border: none;
+        }
+
+        button {
+            background: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+
+        #attackSection, #gameSection {
+            display: none;
+        }
+    </style>
 </head>
 
 <body>
-    <div id="loginSection">
+    <div class="container" id="loginSection">
         <h1>Welcome to Battleship</h1>
-        <p>Enter your login code:</p>
-        <input type="text" id="loginCode" placeholder="Enter Code">
-        <button onclick="login()">Login</button>
-        <p id="loginError" style="color: red;"></p>
+        <p>Select Your Name to Start:</p>
+        <select id="playerSelect">
+            <option value="">-- Select Player --</option>
+            <option value="Hamza Noor">Hamza Noor</option>
+            <option value="Samer Smahan">Samer Smahan</option>
+            <option value="Moatz Abo Alkhair">Moatz Abo Alkhair</option>
+            <option value="Braa Abo Klisha">Braa Abo Klisha</option>
+            <option value="Yousef Mohaned">Yousef Mohaned</option>
+        </select>
+        <button onclick="startGame()">Start</button>
     </div>
 
-    <div id="gameSection" style="display:none;">
+    <div class="container" id="gameSection">
         <h2>Game Board</h2>
-        <div id="gameBoard"></div>
-        <button onclick="startGame()">Start Game</button>
+        <div class="board" id="gameBoard"></div>
+        <button onclick="readyUp()">Ready</button>
     </div>
 
-    <div id="attackSection" style="display:none;">
+    <div class="container" id="attackSection">
         <h2>Attack Phase</h2>
-        <input type="text" id="attackCode" placeholder="Enter Attack Code">
+        <div class="board" id="attackBoard"></div>
+        <h3>Enter Grid Coordinates to Attack (e.g., A1, B5)</h3>
+        <input type="text" id="attackCoordinate" placeholder="Enter Coordinate">
         <button onclick="useAttackCode()">Attack</button>
         <p id="attackResult"></p>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyA2l_bt2MxCPMJGl9ImOjp2FBU-skkkSNw",
+            authDomain: "battleship-10733.firebaseapp.com",
+            databaseURL: "https://battleship-10733-default-rtdb.firebaseio.com",
+            projectId: "battleship-10733",
+            storageBucket: "battleship-10733.appspot.com",
+            messagingSenderId: "137222756550",
+            appId: "1:137222756550:web:c62b2691c35d4ea6061fc7",
+            measurementId: "G-0S248X0JM1"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        let selectedPlayer = "";
+
+        function startGame() {
+            selectedPlayer = document.getElementById("playerSelect").value;
+            if (selectedPlayer) {
+                document.getElementById("loginSection").style.display = "none";
+                document.getElementById("gameSection").style.display = "block";
+                createBoard("gameBoard", placeTroop);
+            } else {
+                alert("Please select a player.");
+            }
+        }
+
+        function createBoard(boardId, clickHandler) {
+            const board = document.getElementById(boardId);
+            board.innerHTML = "";
+            for (let i = 0; i < 10; i++) {
+                for (let j = 0; j < 10; j++) {
+                    let cell = document.createElement("div");
+                    cell.classList.add("cell");
+                    cell.dataset.coord = `${i},${j}`;
+                    cell.textContent = `${i},${j}`;
+                    if (clickHandler) cell.addEventListener("click", clickHandler);
+                    board.appendChild(cell);
+                }
+            }
+        }
+
+        let placedTroops = new Set();
+        function placeTroop(event) {
+            if (placedTroops.size < 12) {
+                event.target.classList.add("placed");
+                placedTroops.add(event.target.dataset.coord);
+            } else {
+                alert("You can only place 12 troops.");
+            }
+        }
+
+        function readyUp() {
+            document.getElementById("gameSection").style.display = "none";
+            document.getElementById("attackSection").style.display = "block";
+            createBoard("attackBoard", attack);
+        }
+
+        function attack(event) {
+            let coordinate = event.target.dataset.coord;
+            let result = document.getElementById("attackResult");
+            let hit = placedTroops.has(coordinate);
+            result.textContent = hit ? "Hit! +5 Points" : "You missed!";
+        }
+    </script>
 </body>
 
 </html>
