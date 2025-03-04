@@ -5,15 +5,70 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Battleship Game</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
     <script src="script.js" defer></script>
-    <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-database.js"></script>
     <style>
-        /* Your CSS for styling */
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+        .board {
+            display: grid;
+            grid-template-columns: repeat(10, 40px);
+            grid-template-rows: repeat(10, 40px);
+            gap: 2px;
+            margin: 20px auto;
+            width: fit-content;
+        }
+        .cell {
+            width: 40px;
+            height: 40px;
+            background-color: lightblue;
+            border: 1px solid white;
+            text-align: center;
+            line-height: 40px;
+            cursor: pointer;
+        }
+        .cell.placed {
+            background-color: red;
+        }
+        .cell.hit {
+            background-color: green;
+        }
+        .cell.miss {
+            background-color: gray;
+        }
+        input, button, select {
+            padding: 10px;
+            margin: 10px;
+            border-radius: 5px;
+            border: none;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        #attackSection, #adminSection {
+            display: none;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
-    <!-- Login Section -->
     <div class="container" id="loginSection">
         <h1>Welcome to the Battleship Game</h1>
         <p>Enter your login code to continue:</p>
@@ -21,15 +76,13 @@
         <button onclick="login()">Login</button>
     </div>
 
-    <!-- Game Section -->
     <div class="container" id="gameSection" style="display:none;">
         <h2>Place Your Troops</h2>
         <div class="board" id="gameBoard"></div>
-        <button id="readyButton">Ready</button>
+        <button onclick="readyUp()">Ready</button>
     </div>
 
-    <!-- Attack Section -->
-    <div class="container" id="attackSection" style="display:none;">
+    <div class="container" id="attackSection">
         <h2>Attack Phase</h2>
         <div class="board" id="attackBoard"></div>
         <h3>Enter Attack Code</h3>
@@ -48,11 +101,15 @@
         <p id="attackResult"></p>
     </div>
 
-    <!-- Admin Panel -->
-    <div class="container" id="adminSection" style="display:none;">
+    <div class="container" id="adminSection">
         <h2>Admin Panel</h2>
         <h3>Player Scores</h3>
         <ul id="scoreList"></ul>
     </div>
+
+    <script>
+        // This will link to the script.js file we created earlier
+        // Make sure you import Firebase SDK and other required scripts here as in the script.js example
+    </script>
 </body>
 </html>
