@@ -1,41 +1,58 @@
-<!DOCTYPE html>
-<html lang="en">
+// Firebase Configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyA2l_bt2MxCPMJGl9ImOjp2FBU-skkkSNw",
+    authDomain: "battleship-10733.firebaseapp.com",
+    databaseURL: "https://battleship-10733-default-rtdb.firebaseio.com",
+    projectId: "battleship-10733",
+    storageBucket: "battleship-10733.appspot.com",
+    messagingSenderId: "137222756550",
+    appId: "1:137222756550:web:c62b2691c35d4ea6061fc7",
+    measurementId: "G-0S248X0JM1"
+};
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Battleship Game</title>
-    <link rel="stylesheet" href="styles.css">
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-database.js"></script>
-</head>
+// Predefined Player Codes
+const playerCodes = {
+    "Hamza Noor": "HN123",
+    "Samer Smahan": "SS456",
+    "Moatz Abo Alkhair": "MA789",
+    "Braa Abo Klisha": "BK101",
+    "Yousef Mohaned": "YM112",
+    "Admin": "ADMIN4444"
+};
 
-<body>
-    <div id="loginSection">
-        <h1>Welcome to Battleship</h1>
-        <p>Enter your login code:</p>
-        <input type="text" id="loginCode" placeholder="Enter Code">
-        <button onclick="login()">Login</button>
-        <p id="loginError" style="color: red;"></p>
-    </div>
+// Login Function
+function login() {
+    const code = document.getElementById("loginCode").value.trim();
+    const loginError = document.getElementById("loginError");
 
-    <div id="gameSection" style="display:none;">
-        <h2>Game Board</h2>
-        <div id="gameBoard"></div>
-        <button onclick="startGame()">Start Game</button>
-    </div>
+    let playerName = Object.keys(playerCodes).find(name => playerCodes[name] === code);
 
-    <div id="attackSection" style="display:none;">
-        <h2>Attack Phase</h2>
-        <input type="text" id="attackCode" placeholder="Enter Attack Code">
-        <button onclick="useAttackCode()">Attack</button>
-        <p id="attackResult"></p>
-    </div>
+    if (playerName) {
+        loginError.textContent = "";
+        document.getElementById("loginSection").style.display = "none";
 
-    <script src="script.js"></script>
-</body>
+        if (playerName === "Admin") {
+            document.getElementById("attackSection").style.display = "block"; // Admin View
+        } else {
+            document.getElementById("gameSection").style.display = "block"; // Player View
+        }
+    } else {
+        loginError.textContent = "Invalid login code. Try again!";
+    }
+}
 
-</html>
+// Attack Code Functionality
+function useAttackCode() {
+    const attackCode = document.getElementById("attackCode").value.trim();
+    const attackResult = document.getElementById("attackResult");
+
+    if (attackCode === "SECRET123") {
+        attackResult.textContent = "Hit! Enemy troop destroyed!";
+    } else {
+        attackResult.textContent = "Missed! Try again.";
+    }
+}
