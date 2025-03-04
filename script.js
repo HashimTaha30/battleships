@@ -18,7 +18,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// Player data and codes
+// Player data and codes stored in the Firebase Database
 const playerCodes = {
   "Hamza Noor": "HN123",
   "Samer Smahan": "SS456",
