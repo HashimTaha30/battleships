@@ -1,7 +1,8 @@
+// Import Firebase functions
 import { initializeApp } from "firebase/app";
-import { getDatabase, ref, set, get, onValue } from "firebase/database";
+import { getDatabase, ref, set, get } from "firebase/database";
 
-// Your web app's Firebase configuration
+// Your Firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyA2l_bt2MxCPMJGl9ImOjp2FBU-skkkSNw",
     authDomain: "battleship-10733.firebaseapp.com",
@@ -17,33 +18,60 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
+// Define player codes (for login validation)
 const playerCodes = {
     "Hamza Noor": "HN123",
     "Samer Smahan": "SS456",
     "Moatz Abo Alkhair": "MA789",
     "Braa Abo Klisha": "BK101",
-    "Yousef Mohaned": "YM112"
+    "Yousef Mohaned": "YM112",
+    "Admin": "ADMIN4444"
 };
 
-let placedTroops = new Set();
-let playerId = null;
-let currentGameId = "game123"; // Example game ID, should be dynamically generated
+// Initialize player scores
+let playerScores = {
+    "Hamza Noor": 0,
+    "Samer Smahan": 0,
+    "Moatz Abo Alkhair": 0,
+    "Braa Abo Klisha": 0,
+    "Yousef Mohaned": 0
+};
 
+// Store placed troops for each player
+let placedTroops = new Set();
+let playerId = ""; // Store current player's ID
+
+// Login function
 function login() {
+    console.log("Login function triggered"); // Debugging log
     let code = document.getElementById("loginCode").value;
     let playerName = Object.keys(playerCodes).find(name => playerCodes[name] === code);
-
+    
     if (playerName) {
         alert(`Welcome, ${playerName}!`);
         playerId = playerName;
+
+        // Store login status in Firebase (optional)
+        set(ref(db, 'players/' + playerName), {
+            status: 'online',
+            score: playerScores[playerName]
+        });
+
+        // Switch to game board section
         document.getElementById("loginSection").style.display = "none";
-        document.getElementById("gameSection").style.display = "block";
-        createBoard("gameBoard", placeTroop);
+        if (playerName === "Admin") {
+            document.getElementById("adminSection").style.display = "block";
+            updateAdminPanel();
+        } else {
+            document.getElementById("gameSection").style.display = "block";
+            createBoard("gameBoard", placeTroop);
+        }
     } else {
         alert("Invalid login code");
     }
 }
 
+// Create game board
 function createBoard(boardId, clickHandler) {
     const board = document.getElementById(boardId);
     board.innerHTML = "";
@@ -59,65 +87,58 @@ function createBoard(boardId, clickHandler) {
     }
 }
 
+// Function to place troops
 function placeTroop(event) {
     if (placedTroops.size < 12) {
         event.target.classList.add("placed");
         placedTroops.add(event.target.dataset.coord);
-        set(ref(db, `games/${currentGameId}/board/${playerId}`), Array.from(placedTroops));
     } else {
         alert("You can only place 12 troops.");
     }
 }
 
+// Attack function
 function useAttackCode() {
     let coordinate = document.getElementById("attackCoordinate").value;
     let result = document.getElementById("attackResult");
-    let hit = false;
-
-    // Check if the coordinate is a hit (check the opponent's board)
-    const gameRef = ref(db, `games/${currentGameId}/board`);
-    get(gameRef).then(snapshot => {
-        snapshot.forEach(playerBoard => {
-            if (playerBoard.val().includes(coordinate)) {
-                hit = true;
-            }
-        });
-
-        result.textContent = hit ? "Hit! +5 Points" : "Missed!";
-        if (hit) {
-            updateScore(playerId);
-        }
-    });
-}
-
-function updateScore(playerName) {
-    const scoreRef = ref(db, `games/${currentGameId}/scores/${playerName}`);
-    get(scoreRef).then(snapshot => {
-        let newScore = snapshot.val() + 5; // Add points for a hit
-        set(scoreRef, newScore);
-        loadScores();
-    });
-}
-
-function loadScores() {
-    const scoreList = document.getElementById("scoreList");
-    const gameRef = ref(db, `games/${currentGameId}`);
     
-    onValue(gameRef, (snapshot) => {
-        const scores = snapshot.val().scores;
-        scoreList.innerHTML = '';  // Clear the list
-        
-        for (const player in scores) {
-            const li = document.createElement("li");
-            li.textContent = `${player}: ${scores[player]} points`;
-            scoreList.appendChild(li);
-        }
-    });
+    // Check if the coordinate is a hit
+    let hit = placedTroops.has(coordinate);
+    result.textContent = hit ? "Hit! +5 Points" : "You have hit nothing.";
+    
+    if (hit) {
+        playerScores[playerId] += 5;
+        // Update player score in Firebase
+        set(ref(db, 'players/' + playerId), {
+            score: playerScores[playerId]
+        });
+    }
+
+    updateAdminPanel();  // Update score on the admin panel
 }
 
-// Ready Button to start attacking phase
-document.getElementById("readyButton").addEventListener("click", () => {
+// Update admin panel
+function updateAdminPanel() {
+    let scoreList = document.getElementById("scoreList");
+    scoreList.innerHTML = "";
+    for (let player in playerScores) {
+        let li = document.createElement("li");
+        li.textContent = `${player}: ${playerScores[player]} points`;
+        scoreList.appendChild(li);
+    }
+}
+
+// Log out player (optional)
+function logout() {
+    set(ref(db, 'players/' + playerId), {
+        status: 'offline',
+        score: playerScores[playerId]
+    });
+
     document.getElementById("gameSection").style.display = "none";
-    document.getElementById("attackSection").style.display = "block";
-    createBoard("attackBoard", useAttackCode);
-});
+    document.getElementById("loginSection").style.display = "block";
+    alert(`Goodbye, ${playerId}!`);
+    playerId = ""; // Reset playerId
+    placedTroops.clear(); // Reset troops
+    playerScores[playerId] = 0; // Reset score
+}
