@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Battleship Game</title>
+    <link rel="stylesheet" href="styles.css">  <!-- Link to external CSS file -->
+</head>
+<body>
+    <div class="scoreboard">
+        <span>Hamza Noor: <span id="scoreHamzaNoor">0</span> points</span>
+        <span>Samer Smahan: <span id="scoreSamerSmahan">0</span> points</span>
+        <span>Moatz Abo Alkhair: <span id="scoreMoatzAboAlkhair">0</span> points</span>
+        <span>Braa Abo Klisha: <span id="scoreBraaAboKlisha">0</span> points</span>
+        <span>Yousef Mohaned: <span id="scoreYousefMohaned">0</span> points</span>
+    </div>
+
+    <div class="container" id="playerListSection">
+        <h1>Select a Player</h1>
+        <ul>
+            <li><button onclick="login('Hamza Noor')">Hamza Noor</button></li>
+            <li><button onclick="login('Samer Smahan')">Samer Smahan</button></li>
+            <li><button onclick="login('Moatz Abo Alkhair')">Moatz Abo Alkhair</button></li>
+            <li><button onclick="login('Braa Abo Klisha')">Braa Abo Klisha</button></li>
+            <li><button onclick="login('Yousef Mohaned')">Yousef Mohaned</button></li>
+        </ul>
+    </div>
+
+    <div class="container" id="gameSection" style="display:none;">
+        <h2>Place Your Troops</h2>
+        <div class="board" id="gameBoard"></div>
+        <button id="readyButton" onclick="readyUp()">Ready</button>
+    </div>
+
+    <div class="container" id="attackSection">
+        <h2>Attack Phase</h2>
+        <div class="board" id="attackBoard"></div>
+        <h3>Enter Attack Code</h3>
+        <input type="text" id="attackCode" placeholder="Enter Attack Code">
+        <h3>Select a Player to Attack</h3>
+        <select id="targetPlayer">
+            <option value="Hamza Noor">Hamza Noor</option>
+            <option value="Samer Smahan">Samer Smahan</option>
+            <option value="Moatz Abo Alkhair">Moatz Abo Alkhair</option>
+            <option value="Braa Abo Klisha">Braa Abo Klisha</option>
+            <option value="Yousef Mohaned">Yousef Mohaned</option>
+        </select>
+        <h3>Enter Grid Coordinates to Attack (e.g., A1, B5)</h3>
+        <input type="text" id="attackCoordinate" placeholder="Enter Coordinate">
+        <button onclick="useAttackCode()">Attack</button>
+        <p id="attackResult"></p>
+    </div>
+
+    <div class="container" id="adminSection">
+        <h2>Admin Panel</h2>
+        <h3>Player Scores</h3>
+        <ul id="scoreList"></ul>
+    </div>
+
+    <script src="script.js"></script>  <!-- Link to external JS file -->
+</body>
+</html>
