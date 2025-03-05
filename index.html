@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Battleship Game</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="script.js" defer></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -151,10 +149,7 @@
             "ATK021", "ATK022", "ATK0234", "ATK024", "ATK025"
         ]);
 
-        let currentPlayer = "";
-
         function login(playerName) {
-            currentPlayer = playerName;
             document.getElementById("playerListSection").style.display = "none";
             if (playerName === "Admin") {
                 document.getElementById("adminSection").style.display = "block";
@@ -214,7 +209,7 @@
 
             let hit = placedTroops.has(coordinate);
             result.textContent = hit ? "Hit! +5 Points" : "You have hit nothing.";
-            if (hit) playerScores[currentPlayer] += 5;
+            if (hit) playerScores["Hamza Noor"] += 5;
             updateAdminPanel();
             updateScoresDisplay();
         }
