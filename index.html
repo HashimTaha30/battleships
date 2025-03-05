@@ -144,14 +144,17 @@
 
         let placedTroops = new Set();
         const attackCodes = new Set([
-            "ATK04", "ATK023 "ATK003", "ATK094, "ATK005",
-            "ATK54", "ATK0345"ATK008", "ATK009", "ATK010",
+            "ATK004", "ATK023", "ATK003", "ATK094", "ATK005",
+            "ATK054", "ATK0345", "ATK008", "ATK009", "ATK010",
             "ATK031", "ATK012", "ATK013", "ATK014", "ATK015",
-            "ATK56", "ATK017", "ATK018", "ATK019", "ATK020",
-            "ATK21", "ATK022", "ATK0234, "ATK024", "ATK025"
+            "ATK056", "ATK017", "ATK018", "ATK019", "ATK020",
+            "ATK021", "ATK022", "ATK0234", "ATK024", "ATK025"
         ]);
 
+        let currentPlayer = "";
+
         function login(playerName) {
+            currentPlayer = playerName;
             document.getElementById("playerListSection").style.display = "none";
             if (playerName === "Admin") {
                 document.getElementById("adminSection").style.display = "block";
@@ -211,7 +214,7 @@
 
             let hit = placedTroops.has(coordinate);
             result.textContent = hit ? "Hit! +5 Points" : "You have hit nothing.";
-            if (hit) playerScores["Hamza Noor"] += 5;
+            if (hit) playerScores[currentPlayer] += 5;
             updateAdminPanel();
             updateScoresDisplay();
         }
